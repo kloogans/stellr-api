@@ -23,6 +23,7 @@ app.get("/instagram", (req, res) => {
       const json = await data.json()
       const user = json.graphql.user
       const feed = json.graphql.user.edge_owner_to_timeline_media.edges
+      const feedInfo = json.graphql.user.edge_owner_to_timeline_media
 
       console.log(json)
 
@@ -58,7 +59,11 @@ app.get("/instagram", (req, res) => {
           comments_avg: averageComments,
           totalEngagementRate: totalEngagement,
           is_private: user.is_private,
-          posts: feed
+          posts: feed,
+          feed_info: {
+            posts_count: feedInfo.count,
+            end_cursor: feedInfo.page_info.end_cursor
+          }
         }
       }
     } catch (e) {
