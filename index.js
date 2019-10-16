@@ -13,6 +13,23 @@ app.get("/", (req, res) => {
   res.send("api running")
 })
 
+app.get("/instagram/media", (req, res) => {
+  const fetchMedia = async () => {
+    const url = `https://instagram.com/graphql/query/?query_id=17888483320059182&id=${req.query.id}&first=12&after=${req.query.end_cursor}`
+
+    try {
+      const d = await fetch(url)
+      const data = await d.json()
+      res.send(data)
+    } catch (e) {
+      console.error(e)
+      res.send(e)
+    }
+  }
+
+  fetchMedia()
+})
+
 app.get("/instagram", (req, res) => {
   let instagram_data
 
@@ -22,16 +39,28 @@ app.get("/instagram", (req, res) => {
       const data = await fetch(url)
       const json = await data.json()
       const user = json.graphql.user
-      const feed = json.graphql.user.edge_owner_to_timeline_media.edges
       const feedInfo = json.graphql.user.edge_owner_to_timeline_media
+      let feed
 
-      console.log(json)
+      try {
+        const media = await fetch(
+          `http://localhost:5000/instagram/media?id=${user.id}&end_cursor=${feedInfo.page_info.end_cursor}`
+        )
+        const mediaD = await media
+        const mediaJ = await media.json()
+        feed = mediaJ.data.user.edge_owner_to_timeline_media.edges
+      } catch (e) {
+        feed = []
+        // feed = json.graphql.user.edge_owner_to_timeline_media.edges
+        console.error(e)
+      }
 
       let likes = 0,
         comments = 0
 
       feed.forEach(post => {
-        const l = post.node.edge_liked_by.count
+        console.log(post.node)
+        const l = post.node.edge_media_preview_like.count
         const c = post.node.edge_media_to_comment.count
         likes += l
         comments += c
