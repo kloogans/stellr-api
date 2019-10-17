@@ -4,6 +4,7 @@ const cors = require("cors")
 const bodyParser = require("body-parser")
 const app = express()
 const port = 5000
+const fetchData = require("./utils/fetchData")
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -13,21 +14,9 @@ app.get("/", (req, res) => {
   res.send("api running")
 })
 
-app.get("/instagram/media", (req, res) => {
-  const fetchMedia = async () => {
-    const url = `https://instagram.com/graphql/query/?query_id=17888483320059182&id=${req.query.id}&first=12&after=${req.query.end_cursor}`
-
-    try {
-      const d = await fetch(url)
-      const data = await d.json()
-      res.send(data)
-    } catch (e) {
-      console.error(e)
-      res.send(e)
-    }
-  }
-
-  fetchMedia()
+app.get("/instagram/media", async (req, res) => {
+  const data = await fetchData.fetchMedia(req.query.id, req.query.end_cursor)
+  res.send(data)
 })
 
 app.get("/instagram", (req, res) => {
@@ -40,26 +29,15 @@ app.get("/instagram", (req, res) => {
       const json = await data.json()
       const user = json.graphql.user
       const feedInfo = json.graphql.user.edge_owner_to_timeline_media
-      let feed
-
-      try {
-        const media = await fetch(
-          `http://localhost:5000/instagram/media?id=${user.id}&end_cursor=${feedInfo.page_info.end_cursor}`
-        )
-        const mediaD = await media
-        const mediaJ = await media.json()
-        feed = mediaJ.data.user.edge_owner_to_timeline_media.edges
-      } catch (e) {
-        feed = []
-        // feed = json.graphql.user.edge_owner_to_timeline_media.edges
-        console.error(e)
-      }
+      let feed = await fetchData.fetchMedia(
+        user.id,
+        feedInfo.page_info.end_cursor
+      )
 
       let likes = 0,
         comments = 0
 
       feed.forEach(post => {
-        console.log(post.node)
         const l = post.node.edge_media_preview_like.count
         const c = post.node.edge_media_to_comment.count
         likes += l
