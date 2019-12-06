@@ -1,9 +1,19 @@
+require('dotenv').config()
 const fetch = require("node-fetch")
 const express = require("express")
 const cors = require("cors")
 const bodyParser = require("body-parser")
 const app = express()
 const port = 5000
+const Twit = require('twit')
+const T = new Twit({
+  consumer_key: process.env.TW_CONSUMER,
+  consumer_secret: process.env.TW_CONSUMER_SECRET,
+  access_token: process.env.TW_ACCESS_TOKEN,
+  access_token_secret: process.env.TW_ACCESS_TOKEN_SECRET,
+  timeout_ms: 60 * 1000,
+  strictSSL: true
+})
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -11,6 +21,14 @@ app.use(cors())
 
 app.get("/", (req, res) => {
   res.send("api running")
+})
+
+app.get('/twitter', (req, res) => {
+  console.log('running')
+  T.get('users/lookup', { screen_name: req.query.username }, (err, data, response) => {
+    console.log(data[0])
+    res.send(data[0])
+  })
 })
 
 app.get("/instagram", (req, res) => {
