@@ -26,7 +26,6 @@ app.get("/", (req, res) => {
 app.get('/twitter', (req, res) => {
   console.log('running')
   T.get('users/lookup', { screen_name: req.query.username }, (err, data, response) => {
-    console.log(data[0])
     res.send(data[0])
   })
 })
