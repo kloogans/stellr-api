@@ -1,11 +1,11 @@
-require('dotenv').config()
+require("dotenv").config()
 const fetch = require("node-fetch")
 const express = require("express")
 const cors = require("cors")
 const bodyParser = require("body-parser")
 const app = express()
 const port = 5000
-const Twit = require('twit')
+const Twit = require("twit")
 const T = new Twit({
   consumer_key: process.env.TW_CONSUMER,
   consumer_secret: process.env.TW_CONSUMER_SECRET,
@@ -23,11 +23,35 @@ app.get("/", (req, res) => {
   res.send("api running")
 })
 
-app.get('/twitter', (req, res) => {
-  console.log('running')
-  T.get('users/lookup', { screen_name: req.query.username }, (err, data, response) => {
-    res.send(data[0])
-  })
+app.get("/twitter", (req, res) => {
+  console.log("running")
+  T.get(
+    "users/lookup",
+    { screen_name: req.query.username },
+    (err, data, response) => {
+      res.send(data[0])
+    }
+  )
+})
+
+app.get("/twitter/feed", (req, res) => {
+  console.log("running")
+  T.get(
+    "statuses/user_timeline",
+    {
+      screen_name: req.query.username,
+      count: 200,
+      include_rts: false,
+      exclude_replies: true
+    },
+    (err, data, response) => {
+      data.map(tweet => {
+        delete tweet.user
+      })
+      // console.log(data)
+      res.send(data)
+    }
+  )
 })
 
 app.get("/instagram", (req, res) => {
