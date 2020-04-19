@@ -4,7 +4,7 @@ const express = require("express")
 const cors = require("cors")
 const bodyParser = require("body-parser")
 const app = express()
-const port = 8080
+const port = 5000
 const Twit = require("twit")
 const T = new Twit({
   consumer_key: process.env.TW_CONSUMER,
