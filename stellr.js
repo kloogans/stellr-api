@@ -4,7 +4,7 @@ const express = require("express")
 const cors = require("cors")
 const bodyParser = require("body-parser")
 const app = express()
-const port = 5000
+const port = 8080
 const Twit = require("twit")
 const T = new Twit({
   consumer_key: process.env.TW_CONSUMER,
@@ -32,6 +32,17 @@ app.get("/twitter", (req, res) => {
       res.send(data[0])
     }
   )
+})
+
+app.get("/weather", async (req, res) => {
+  const url = `https://api.darksky.net/forecast/${process.env.DARK_SKY_KEY}/27.810300,-82.697240`
+  try {
+    const data = await fetch(url),
+      json = await data.json()
+    res.send(json.currently)
+  } catch (e) {
+    console.error(e)
+  }
 })
 
 app.get("/twitter/feed", (req, res) => {
