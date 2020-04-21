@@ -34,7 +34,6 @@ app.get("/twitter", (req, res) => {
       }
     )
   } else if (req.query.id) {
-    console.log('id detected')
     T.get(
       "users/lookup",
       { user_id: req.query.id },
