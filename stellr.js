@@ -25,13 +25,24 @@ app.get("/", (req, res) => {
 
 app.get("/twitter", (req, res) => {
   console.log("running")
-  T.get(
-    "users/lookup",
-    { screen_name: req.query.username },
-    (err, data, response) => {
-      res.send(data[0])
-    }
-  )
+  if (req.query.username) {
+    T.get(
+      "users/lookup",
+      { screen_name: req.query.username },
+      (err, data, response) => {
+        res.send(data[0])
+      }
+    )
+  } else if (req.query.id) {
+    console.log('id detected')
+    T.get(
+      "users/lookup",
+      { user_id: req.query.id },
+      (err, data, response) => {
+        res.send(data[0])
+      }
+    )
+  }
 })
 
 app.get("/weather", async (req, res) => {
