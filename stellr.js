@@ -80,14 +80,16 @@ app.get("/instagram", (req, res) => {
 
   const fetchUser = async () => {
     const url = `https://www.instagram.com/${req.query.username}/?__a=1`
+    console.log(url)
     try {
       const data = await fetch(url)
       const json = await data.json()
+      console.log(json)
       const user = json.graphql.user
       const feed = json.graphql.user.edge_owner_to_timeline_media.edges
       const feedInfo = json.graphql.user.edge_owner_to_timeline_media
 
-      console.log(json)
+      // console.log(json)
 
       let likes = 0,
         comments = 0
