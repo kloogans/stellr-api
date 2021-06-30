@@ -16,7 +16,7 @@ const T = new Twit({
 })
 
 app.use(express.json())
-app.use(bodyexpressParser.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 
 app.get("/", (req, res) => {
