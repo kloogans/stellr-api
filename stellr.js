@@ -15,8 +15,8 @@ const T = new Twit({
   strictSSL: true
 })
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(bodyexpressParser.urlencoded({ extended: true }))
 app.use(cors())
 
 app.get("/", (req, res) => {
@@ -24,7 +24,6 @@ app.get("/", (req, res) => {
 })
 
 app.get("/twitter", (req, res) => {
-  console.log("running")
   if (req.query.username) {
     T.get(
       "users/lookup",
@@ -44,19 +43,7 @@ app.get("/twitter", (req, res) => {
   }
 })
 
-app.get("/weather", async (req, res) => {
-  const url = `https://api.darksky.net/forecast/${process.env.DARK_SKY_KEY}/27.810300,-82.697240`
-  try {
-    const data = await fetch(url),
-      json = await data.json()
-    res.send(json.currently)
-  } catch (e) {
-    console.error(e)
-  }
-})
-
 app.get("/twitter/feed", (req, res) => {
-  console.log("running")
   T.get(
     "statuses/user_timeline",
     {
@@ -69,7 +56,6 @@ app.get("/twitter/feed", (req, res) => {
       data.map(tweet => {
         delete tweet.user
       })
-      // console.log(data)
       res.send(data)
     }
   )
@@ -80,16 +66,12 @@ app.get("/instagram", (req, res) => {
 
   const fetchUser = async () => {
     const url = `https://www.instagram.com/${req.query.username}/?__a=1`
-    console.log(url)
     try {
       const data = await fetch(url)
       const json = await data.json()
-      console.log(json)
       const user = json.graphql.user
       const feed = json.graphql.user.edge_owner_to_timeline_media.edges
       const feedInfo = json.graphql.user.edge_owner_to_timeline_media
-
-      // console.log(json)
 
       let likes = 0,
         comments = 0
